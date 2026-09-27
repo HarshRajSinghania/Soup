@@ -492,7 +492,7 @@ class TestShrinkCli:
             ["shrink", "--model", "x", "--drop-layers", "2", "--calib", str(outside)],
         )
         assert r.exit_code == 1, (r.output, repr(r.exception))
-        assert "must stay under cwd" in " ".join(r.output.split())
+        assert "must stay under cwd" in " ".join(_strip_ansi(r.output).split())
 
     def test_rejects_bad_tolerance(self, tmp_path, monkeypatch):
         from typer.testing import CliRunner
@@ -768,7 +768,7 @@ class TestReviewFixes:
             )
 
         monkeypatch.setattr(
-            "soup_cli.commands.shrink.AutoConfig.from_pretrained",
+            "soup_cli.commands.shrink._resolve_trc",
             _from_pretrained_must_not_run,
         )
         r = CliRunner().invoke(
@@ -778,7 +778,7 @@ class TestReviewFixes:
              "--output-dir", str(tmp_path / "escape")],
         )
         assert r.exit_code == 1, (r.output, repr(r.exception))
-        assert "must stay under cwd" in " ".join(r.output.split())
+        assert "must stay under cwd" in " ".join(_strip_ansi(r.output).split())
 
     def test_heal_epochs_clamp_rejects_absurd_combo(self):
         """Huge --heal-steps over a tiny heal set is refused, not silently run."""
